@@ -1,0 +1,706 @@
+{
+  "info": {
+    "name": "StageConnect - Candidatures",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3003"
+    },
+    {
+      "key": "cvId",
+      "value": ""
+    },
+    {
+      "key": "candidatureId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "CV",
+      "item": [
+        {
+          "name": "1. Ajouter un CV",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cvs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cvs"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etudiantId\": \"etu1\",\n  \"nom\": \"Ben Salah\",\n  \"prenom\": \"Ali\",\n  \"email\": \"ali@esprit.tn\",\n  \"telephone\": \"+216 20 000 000\",\n  \"adresse\": \"Tunis\",\n  \"titre\": \"Etudiant ingenieur 5eme annee - Stage PFE\",\n  \"specialite\": \"Genie logiciel\",\n  \"resume\": \"Etudiant en genie logiciel, passionne par le developpement backend et les architectures microservices.\",\n  \"competences\": [\n    \"Node.js\",\n    \"Express\",\n    \"MongoDB\",\n    \"Docker\"\n  ],\n  \"formations\": [\n    {\n      \"diplome\": \"Cycle ingenieur en informatique\",\n      \"etablissement\": \"ESPRIT\",\n      \"debut\": \"2022\",\n      \"fin\": \"2027\"\n    }\n  ],\n  \"experiences\": [\n    {\n      \"poste\": \"Stagiaire developpeur\",\n      \"entreprise\": \"Sofrecom\",\n      \"debut\": \"07/2025\",\n      \"fin\": \"08/2025\",\n      \"description\": \"Developpement d'une API REST.\"\n    }\n  ],\n  \"projets\": [\n    {\n      \"titre\": \"StageConnect\",\n      \"description\": \"Plateforme de gestion des stages en microservices.\",\n      \"technologies\": [\n        \"Node.js\",\n        \"RabbitMQ\"\n      ]\n    }\n  ],\n  \"langues\": [\n    {\n      \"langue\": \"Francais\",\n      \"niveau\": \"C1\"\n    },\n    {\n      \"langue\": \"Anglais\",\n      \"niveau\": \"B2\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const b = pm.response.json(); if (b._id) pm.collectionVariables.set(\"cvId\", b._id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Liste (pagination + tri)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cvs?page=1&limit=5&sort=nom&order=asc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cvs"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                },
+                {
+                  "key": "sort",
+                  "value": "nom"
+                },
+                {
+                  "key": "order",
+                  "value": "asc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Filtre + recherche",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cvs?competence=node.js&q=ali",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cvs"
+              ],
+              "query": [
+                {
+                  "key": "competence",
+                  "value": "node.js"
+                },
+                {
+                  "key": "q",
+                  "value": "ali"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. Afficher un CV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cvs/{{cvId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cvs",
+                "{{cvId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. Modifier un CV",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cvs/{{cvId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cvs",
+                "{{cvId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"competences\": [\n    \"Node.js\",\n    \"Express\",\n    \"MongoDB\",\n    \"Docker\",\n    \"RabbitMQ\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "6. Statistiques CV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cvs/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cvs",
+                "stats"
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Upload CV (PDF, Word ou image)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cvs/{{cvId}}/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cvs",
+                "{{cvId}}",
+                "upload"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "fichier",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "8. METIER - Generer le CV PFE (PDF)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cvs/{{cvId}}/generer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cvs",
+                "{{cvId}}",
+                "generer"
+              ]
+            }
+          }
+        },
+        {
+          "name": "9. Supprimer un CV",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cvs/{{cvId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cvs",
+                "{{cvId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Candidatures",
+      "item": [
+        {
+          "name": "1. Postuler",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etudiantId\": \"etu1\",\n  \"offreId\": \"off1\",\n  \"offreTitre\": \"Stage PFE Node.js\",\n  \"entrepriseId\": \"ent1\",\n  \"cv\": \"{{cvId}}\",\n  \"lettreMotivation\": \"Motive par le developpement backend.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const b = pm.response.json(); if (b._id) pm.collectionVariables.set(\"candidatureId\", b._id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Liste (pagination + tri)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures?page=1&limit=5&sort=createdAt&order=desc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Filtre + recherche",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures?statut=EN_ATTENTE&entrepriseId=ent1&q=node",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures"
+              ],
+              "query": [
+                {
+                  "key": "statut",
+                  "value": "EN_ATTENTE"
+                },
+                {
+                  "key": "entrepriseId",
+                  "value": "ent1"
+                },
+                {
+                  "key": "q",
+                  "value": "node"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. Afficher une candidature",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/{{candidatureId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "{{candidatureId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. Modifier une candidature",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/{{candidatureId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "{{candidatureId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lettreMotivation\": \"Nouvelle lettre de motivation.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "6. Statistiques",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "stats"
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Changer le statut",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/{{candidatureId}}/statut",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "{{candidatureId}}",
+                "statut"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"ACCEPTEE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "8. Supprimer une candidature",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/{{candidatureId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "{{candidatureId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Entretiens (metier)",
+      "item": [
+        {
+          "name": "1. Planifier un entretien",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/{{candidatureId}}/entretien",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "{{candidatureId}}",
+                "entretien"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-12-01T10:00:00\",\n  \"dureeMinutes\": 30,\n  \"type\": \"EN_LIGNE\",\n  \"lien\": \"https://meet.google.com/abc-defg-hij\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "2. Reporter l'entretien",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/{{candidatureId}}/entretien",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "{{candidatureId}}",
+                "entretien"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-12-02T14:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "3. Planning des entretiens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/entretiens/planning?entrepriseId=ent1&du=2026-12-01&au=2026-12-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "entretiens",
+                "planning"
+              ],
+              "query": [
+                {
+                  "key": "entrepriseId",
+                  "value": "ent1"
+                },
+                {
+                  "key": "du",
+                  "value": "2026-12-01"
+                },
+                {
+                  "key": "au",
+                  "value": "2026-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. Resultat de l'entretien",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/{{candidatureId}}/entretien/resultat",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "{{candidatureId}}",
+                "entretien",
+                "resultat"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": 16,\n  \"commentaire\": \"Bon profil technique\",\n  \"decision\": \"ACCEPTEE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "5. Annuler l'entretien",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/{{candidatureId}}/entretien",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "{{candidatureId}}",
+                "entretien"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Compteur (metier)",
+      "item": [
+        {
+          "name": "1. Compteur d'un etudiant",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/compteur?etudiantId=etu1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "compteur"
+              ],
+              "query": [
+                {
+                  "key": "etudiantId",
+                  "value": "etu1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Compteur d'une offre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/compteur?offreId=off1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "compteur"
+              ],
+              "query": [
+                {
+                  "key": "offreId",
+                  "value": "off1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Compteur d'une entreprise",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidatures/compteur?entrepriseId=ent1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "candidatures",
+                "compteur"
+              ],
+              "query": [
+                {
+                  "key": "entrepriseId",
+                  "value": "ent1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
