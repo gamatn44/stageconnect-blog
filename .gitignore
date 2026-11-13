@@ -1,5 +1,9 @@
 node_modules/
+<<<<<<< HEAD
 .env
 .env.*
 !.env.example
 npm-debug.log*
+=======
+.env
+>>>>>>> origin/main
