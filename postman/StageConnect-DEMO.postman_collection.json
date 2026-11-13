@@ -1,0 +1,1296 @@
+{
+  "info": {
+    "name": "StageConnect - DEMO",
+    "description": "Démo manuelle du service User (8 actes). Avant de commencer : serveur lancé avec le vrai `.env` (MAIL_USER et DISCORD_WEBHOOK_URL remplis), renseigner `adminEmail` et `adminPassword` dans les variables de la collection, vérifier que `demoEmail` est une adresse Gmail accessible. Exécuter les requêtes dans l'ordre, une par une (pas le Runner : les étapes 26, 27 et 35 sont manuelles). Pas d'assertions : ce n'est pas la collection de tests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{adminToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Acte 1",
+      "description": "Accès protégé et connexion admin",
+      "item": [
+        {
+          "name": "1. Accès protégé sans token (401 Authentification requise)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            },
+            "description": "Résultat attendu : 401, message « Authentification requise ». Aucune donnée n'est renvoyée.\n\nPhrase à dire : « Sans token, l'API refuse tout accès : toutes les routes users et historiques sont protégées. »",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Connexion admin (200, token stocké)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Résultat attendu : 200, `data.token` (JWT) et `data.user`. Le token est stocké automatiquement dans la variable `adminToken`.\n\nPhrase à dire : « Je me connecte en administrateur ; l'API me renvoie un JWT que Postman réutilise ensuite sur toutes les requêtes. »",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"motDePasse\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = pm.response.json().data;",
+                  "pm.collectionVariables.set(\"adminToken\", d.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Liste des utilisateurs avec token (200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            },
+            "description": "Résultat attendu : 200, liste des utilisateurs avec `pagination` (total, page, limit, totalPages). Aucun champ `motDePasse` dans les données.\n\nPhrase à dire : « Avec le token, j'accède à la liste ; le mot de passe n'est jamais renvoyé. »"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Acte 2",
+      "description": "CRUD User",
+      "item": [
+        {
+          "name": "4. Créer un utilisateur (201, userId stocké)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            },
+            "description": "Résultat attendu : 201, utilisateur créé (sans `motDePasse`). Son `_id` est stocké dans `userId`.\n\nAvant de refaire la démo, supprimer ce compte s'il existe encore (requête 38).\n\nPhrase à dire : « Le mot de passe est haché avec bcrypt avant d'être enregistré. »",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Ben Ali\",\n  \"prenom\": \"Sami\",\n  \"email\": \"sami.benali@esprit.tn\",\n  \"motDePasse\": \"Sami2026!\",\n  \"telephone\": \"22123456\",\n  \"role\": \"entreprise\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = pm.response.json().data;",
+                  "pm.collectionVariables.set(\"userId\", d._id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Créer avec le même email (409 email déjà utilisé)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            },
+            "description": "Résultat attendu : 409, « Cet email est déjà utilisé ».\n\nPhrase à dire : « L'unicité de l'email est garantie par un index unique en base. »",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Ben Ali\",\n  \"prenom\": \"Sami\",\n  \"email\": \"sami.benali@esprit.tn\",\n  \"motDePasse\": \"Sami2026!\",\n  \"telephone\": \"22123456\",\n  \"role\": \"entreprise\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Créer avec un body incomplet (400 erreur de validation)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            },
+            "description": "Résultat attendu : 400, « Erreur de validation » avec la liste des messages (prénom, email et mot de passe obligatoires).\n\nPhrase à dire : « La validation Mongoose renvoie tous les champs manquants d'un coup. »",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Utilisateur par id (200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Résultat attendu : 200, l'utilisateur créé à l'étape 4."
+          },
+          "response": []
+        },
+        {
+          "name": "8. Identifiant invalide (400 identifiant invalide)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/123",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "123"
+              ]
+            },
+            "description": "Résultat attendu : 400, « Identifiant invalide » (pas une erreur 500).\n\nPhrase à dire : « Les identifiants sont validés avant d'interroger la base. »"
+          },
+          "response": []
+        },
+        {
+          "name": "9. Modifier statut et rôle (200)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Résultat attendu : 200, utilisateur avec `statut` = inactif et `role` = etudiant.\n\nDiscord : CHANGEMENT_STATUT et CHANGEMENT_ROLE en orange.\n\nPhrase à dire : « Chaque modification faite par un admin est tracée automatiquement dans l'historique, avec l'ancienne et la nouvelle valeur. »",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"inactif\",\n  \"role\": \"etudiant\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10. Historique automatique du compte (200, 4 entrées)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques?user={{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques"
+              ],
+              "query": [
+                {
+                  "key": "user",
+                  "value": "{{userId}}"
+                }
+              ]
+            },
+            "description": "Résultat attendu : 200, 4 entrées : CREATION, MODIFICATION, CHANGEMENT_STATUT, CHANGEMENT_ROLE (la plus récente en premier). Le mot de passe n'apparaît jamais.\n\nPhrase à dire : « Je n'ai rien écrit dans l'historique à la main : tout a été enregistré automatiquement. »"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Acte 3",
+      "description": "CRUD Historique",
+      "item": [
+        {
+          "name": "11. Créer une entrée d'historique (201, historiqueId stocké)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques"
+              ]
+            },
+            "description": "Résultat attendu : 201, entrée créée. Son `_id` est stocké dans `historiqueId`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": \"{{userId}}\",\n  \"action\": \"CONNEXION\",\n  \"description\": \"Entrée ajoutée manuellement pour la démo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = pm.response.json().data;",
+                  "pm.collectionVariables.set(\"historiqueId\", d._id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "12. Action invalide (400 action invalide)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques"
+              ]
+            },
+            "description": "Résultat attendu : 400, erreur de validation : l'action doit appartenir à la liste autorisée.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": \"{{userId}}\",\n  \"action\": \"PIRATAGE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "13. Utilisateur inexistant (404 utilisateur introuvable)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques"
+              ]
+            },
+            "description": "Résultat attendu : 404, utilisateur introuvable (l'identifiant est valide mais ne correspond à aucun compte).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": \"6af5e30b455470d368f99999\",\n  \"action\": \"CONNEXION\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "14. Historique par id (200, user peuplé)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques/{{historiqueId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques",
+                "{{historiqueId}}"
+              ]
+            },
+            "description": "Résultat attendu : 200, le champ `user` contient nom, prenom, email et role (populate)."
+          },
+          "response": []
+        },
+        {
+          "name": "15. Modifier une entrée (200)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques/{{historiqueId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques",
+                "{{historiqueId}}"
+              ]
+            },
+            "description": "Résultat attendu : 200, description mise à jour.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Description modifiée\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "16. Supprimer une entrée (200)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques/{{historiqueId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques",
+                "{{historiqueId}}"
+              ]
+            },
+            "description": "Résultat attendu : 200, entrée supprimée."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Acte 4",
+      "description": "Métiers simples : recherche, filtres, tri, pagination, statistiques",
+      "item": [
+        {
+          "name": "17. Recherche (200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?search=sami",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "sami"
+                }
+              ]
+            },
+            "description": "Résultat attendu : 200, les utilisateurs dont le nom, le prénom ou l'email contient « sami » (insensible à la casse)."
+          },
+          "response": []
+        },
+        {
+          "name": "18. Filtres, tri et pagination (200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?role=etudiant&statut=inactif&sort=nom&order=asc&page=1&limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "etudiant"
+                },
+                {
+                  "key": "statut",
+                  "value": "inactif"
+                },
+                {
+                  "key": "sort",
+                  "value": "nom"
+                },
+                {
+                  "key": "order",
+                  "value": "asc"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Résultat attendu : 200, utilisateurs étudiants inactifs triés par nom croissant, avec `pagination` (limit 5)."
+          },
+          "response": []
+        },
+        {
+          "name": "19. Filtre invalide (400 valeurs autorisées)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?role=directeur",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "directeur"
+                }
+              ]
+            },
+            "description": "Résultat attendu : 400, « Paramètre 'role' invalide (valeurs : etudiant, entreprise, admin) ».\n\nPhrase à dire : « Les paramètres sont validés : une valeur inconnue est refusée avec la liste des valeurs autorisées. »"
+          },
+          "response": []
+        },
+        {
+          "name": "20. Statistiques utilisateurs (200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "stats"
+              ]
+            },
+            "description": "Résultat attendu : 200, `total`, `parRole`, `parStatut` et `inscriptionsParMois`.\n\nPhrase à dire : « Ces statistiques sont calculées par une agrégation MongoDB. »"
+          },
+          "response": []
+        },
+        {
+          "name": "21. Historiques filtrés par action et date (200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques?action=CHANGEMENT_STATUT&dateDebut=2026-11-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques"
+              ],
+              "query": [
+                {
+                  "key": "action",
+                  "value": "CHANGEMENT_STATUT"
+                },
+                {
+                  "key": "dateDebut",
+                  "value": "2026-11-01"
+                }
+              ]
+            },
+            "description": "Résultat attendu : 200, entrées CHANGEMENT_STATUT depuis le 1er novembre 2026, avec `pagination`."
+          },
+          "response": []
+        },
+        {
+          "name": "22. Statistiques historiques (200, parAction et topUtilisateurs)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques",
+                "stats"
+              ]
+            },
+            "description": "Résultat attendu : 200, `total`, `parAction` (toutes les actions, y compris à 0) et `topUtilisateurs` (top 5 avec nom et email)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Acte 5",
+      "description": "Inscription et vérification de l'email (No Auth). Les étapes 26 et 27 se font dans Gmail et le navigateur : cliquer sur le lien reçu, puis recharger la page (400, lien à usage unique).",
+      "item": [
+        {
+          "name": "23. Inscription (201, statut actif et emailVerifie false)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Résultat attendu : 201, compte créé avec `statut` = actif et `emailVerifie` = false : le serveur ignore `statut` et `emailVerifie` envoyés par le client. `demoUserId` est stocké. Un mail de vérification est envoyé à l'adresse de démo.\n\nDiscord : INSCRIPTION en vert.\n\nPhrase à dire : « J'ai essayé de m'inscrire déjà bloqué et déjà vérifié : le serveur ignore ces champs. »",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Hmaied\",\n  \"prenom\": \"Nada\",\n  \"email\": \"{{demoEmail}}\",\n  \"motDePasse\": \"Demo2026!\",\n  \"role\": \"etudiant\",\n  \"statut\": \"bloque\",\n  \"emailVerifie\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = pm.response.json().data;",
+                  "pm.collectionVariables.set(\"demoUserId\", d.user._id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "24. Inscription avec le rôle admin (400 rôle admin interdit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Résultat attendu : 400, rôle invalide : seuls `etudiant` et `entreprise` sont autorisés à l'inscription.\n\nPhrase à dire : « On ne peut pas s'auto-attribuer le rôle administrateur. »",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Pirate\",\n  \"prenom\": \"Test\",\n  \"email\": \"pirate@test.tn\",\n  \"motDePasse\": \"Pirate2026!\",\n  \"role\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "25. Connexion avant vérification (403 Email non vérifié)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Résultat attendu : 403, « Email non vérifié » : même avec le bon mot de passe.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demoEmail}}\",\n  \"motDePasse\": \"Demo2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "28. Connexion après vérification (200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Résultat attendu : 200, token JWT. À envoyer APRÈS les étapes manuelles 26 et 27 (pas de requête Postman) :\n\n26. Ouvrir le mail reçu dans Gmail et cliquer sur le lien de vérification (200, « Email vérifié avec succès »).\n27. Recharger la page du lien → 400, « Lien de vérification invalide ou expiré » (le lien est à usage unique).\n\nDiscord : VERIFICATION_EMAIL en vert.\n\nPhrase à dire : « Le lien contient un token aléatoire dont seul le hash est stocké en base ; il est à usage unique et expire après 24 heures. »",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demoEmail}}\",\n  \"motDePasse\": \"Demo2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Acte 6",
+      "description": "Verrouillage après 5 échecs",
+      "item": [
+        {
+          "name": "29. Mauvais mot de passe (à envoyer 5 fois) (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Résultat attendu : 401, « Email ou mot de passe incorrect » (message générique). À envoyer 5 fois de suite : au 5e échec le compte est verrouillé.\n\nDiscord : VERROUILLAGE en rouge au 5e échec.\n\nPhrase à dire : « Le message est volontairement identique que l'email existe ou non. »",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demoEmail}}\",\n  \"motDePasse\": \"mauvais123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "30. Bon mot de passe sur compte verrouillé (423 compte verrouillé)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Résultat attendu : 423, « Compte verrouillé. Réessayez dans 15 minute(s) », avec l'en-tête `Retry-After`.\n\nPhrase à dire : « Le compte reste verrouillé 15 minutes, même avec le bon mot de passe. »",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demoEmail}}\",\n  \"motDePasse\": \"Demo2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "31. Historique du compte démo (200, 5 ECHEC_CONNEXION et 1 VERROUILLAGE)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques?user={{demoUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques"
+              ],
+              "query": [
+                {
+                  "key": "user",
+                  "value": "{{demoUserId}}"
+                }
+              ]
+            },
+            "description": "Résultat attendu : 200, avec le token admin : 5 entrées ECHEC_CONNEXION et 1 entrée VERROUILLAGE (parmi INSCRIPTION, VERIFICATION_EMAIL et CONNEXION)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Acte 7",
+      "description": "Mot de passe oublié",
+      "item": [
+        {
+          "name": "32. Mot de passe oublié, email inconnu (200 message générique)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/mot-de-passe-oublie",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "mot-de-passe-oublie"
+              ]
+            },
+            "description": "Résultat attendu : 200, « Si un compte existe pour cet email, un code de réinitialisation vient d'être envoyé ».",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"inconnu@test.tn\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "33. Mot de passe oublié, compte existant (200 même message)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/mot-de-passe-oublie",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "mot-de-passe-oublie"
+              ]
+            },
+            "description": "Résultat attendu : 200, exactement le même message que pour un email inconnu. Le code à 6 chiffres est envoyé par mail (valable 15 minutes).\n\nDiscord : DEMANDE_REINITIALISATION en orange.\n\nPhrase à dire : « La réponse est identique dans les deux cas : on ne révèle pas quels emails ont un compte. »",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demoEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "34. Code invalide (400 code invalide)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/reinitialiser-mot-de-passe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "reinitialiser-mot-de-passe"
+              ]
+            },
+            "description": "Résultat attendu : 400, « Code invalide ou expiré ». Chaque code faux compte comme un essai ; au bout de 5 le code est invalidé.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demoEmail}}\",\n  \"code\": \"000000\",\n  \"nouveauMotDePasse\": \"Nouveau2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "35. Réinitialisation avec le code reçu (200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/reinitialiser-mot-de-passe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "reinitialiser-mot-de-passe"
+              ]
+            },
+            "description": "Résultat attendu : 200, « Mot de passe réinitialisé ». AVANT D'ENVOYER : remplacer `CODE_RECU_PAR_MAIL` dans le body par le code à 6 chiffres reçu par mail. Un mail de confirmation est ensuite envoyé.\n\nDiscord : REINITIALISATION_MDP en orange.\n\nPhrase à dire : « Le code est à usage unique, le compte est déverrouillé et toutes les anciennes sessions sont déconnectées. »",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demoEmail}}\",\n  \"code\": \"CODE_RECU_PAR_MAIL\",\n  \"nouveauMotDePasse\": \"Nouveau2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "36. Ancien mot de passe (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Résultat attendu : 401, « Email ou mot de passe incorrect » : l'ancien mot de passe ne fonctionne plus.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demoEmail}}\",\n  \"motDePasse\": \"Demo2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "37. Nouveau mot de passe (200 compte déverrouillé)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Résultat attendu : 200, token JWT : la réinitialisation a aussi levé le verrouillage de l'acte 6.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demoEmail}}\",\n  \"motDePasse\": \"Nouveau2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Acte 8",
+      "description": "Suppression en cascade",
+      "item": [
+        {
+          "name": "38. Supprimer un utilisateur (cascade) (200 avec le nombre d'historiques supprimés)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Résultat attendu : 200, « Utilisateur supprimé avec succès (4 historique(s) supprimé(s)) » : CREATION, MODIFICATION, CHANGEMENT_STATUT et CHANGEMENT_ROLE.\n\nDiscord : SUPPRESSION en rouge.\n\nPhrase à dire : « La suppression d'un utilisateur supprime aussi son historique. La trace de la suppression est conservée sur le compte de l'administrateur. »"
+          },
+          "response": []
+        },
+        {
+          "name": "39. Historique du compte supprimé (200, data vide)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/historiques?user={{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "historiques"
+              ],
+              "query": [
+                {
+                  "key": "user",
+                  "value": "{{userId}}"
+                }
+              ]
+            },
+            "description": "Résultat attendu : 200, `data` = [] et `pagination.total` = 0."
+          },
+          "response": []
+        },
+        {
+          "name": "40. Nettoyage du compte démo (200)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{demoUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{demoUserId}}"
+              ]
+            },
+            "description": "Résultat attendu : 200. À faire APRÈS la démo : supprime le compte `demoEmail` et son historique, pour pouvoir rejouer la démo."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@stageconnect.tn"
+    },
+    {
+      "key": "adminPassword",
+      "value": ""
+    },
+    {
+      "key": "demoEmail",
+      "value": "hmaied.nada1+demo@gmail.com"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "demoUserId",
+      "value": ""
+    },
+    {
+      "key": "historiqueId",
+      "value": ""
+    }
+  ]
+}
