@@ -1,0 +1,1480 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "StageConnect – Service Blog",
+    "version": "1.0.0",
+    "description": "API du microservice Blog : CRUD des blogs et commentaires, recherche, modération, statistiques, tendances, badges d'auteur, traduction et assistant IA."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3002",
+      "description": "Local"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Blogs"
+    },
+    {
+      "name": "Commentaires"
+    },
+    {
+      "name": "Statistiques et tendances"
+    },
+    {
+      "name": "Auteurs et badges"
+    },
+    {
+      "name": "Traduction"
+    },
+    {
+      "name": "Intelligence artificielle"
+    }
+  ],
+  "paths": {
+    "/blog/addblog": {
+      "post": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Créer un blog",
+        "description": "Passe par le middleware de modération.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogInput"
+              },
+              "example": {
+                "titre": "Réussir son entretien de stage",
+                "contenu": "Voici 5 conseils pour préparer votre entretien...",
+                "auteur": "Mohamed Amine Allouche",
+                "email": "amine.allouche@example.com",
+                "categorie": "Conseils"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Blog créé",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Blog"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Contenu refusé par la modération",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moderation"
+                },
+                "example": {
+                  "message": "contenu refusé par la modération",
+                  "champ": "contenu",
+                  "motInterdit": "ca ya dawla"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/showallblog": {
+      "get": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Afficher tous les blogs (du plus récent au plus ancien)",
+        "responses": {
+          "200": {
+            "description": "Liste des blogs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Blog"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/showblog/{id}": {
+      "get": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Afficher un blog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Id du blog",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Le blog",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Blog"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Blog introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "blog introuvable"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Requête invalide",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "..."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/updateblog/{id}": {
+      "put": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Modifier un blog",
+        "description": "Passe par le middleware de modération.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Id du blog",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogInput"
+              },
+              "example": {
+                "titre": "Réussir son entretien de stage (mis à jour)"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Blog modifié",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Blog"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Contenu refusé par la modération",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moderation"
+                },
+                "example": {
+                  "message": "contenu refusé par la modération",
+                  "champ": "contenu",
+                  "motInterdit": "ca ya dawla"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Blog introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "blog introuvable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/deleteblog/{id}": {
+      "delete": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Supprimer un blog (et ses commentaires et questions)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Id du blog",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Supprimé",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": {
+                  "message": "blog, commentaires et questions supprimés"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Blog introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "blog introuvable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/likeblog/{id}": {
+      "put": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Liker un blog (+1)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Id du blog",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Blog avec le nouveau nombre de likes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Blog"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Blog introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "blog introuvable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/search": {
+      "get": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Recherche, filtres et tri",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Mot cherché dans le titre ou le contenu",
+            "schema": {
+              "type": "string"
+            },
+            "example": "CV"
+          },
+          {
+            "name": "categorie",
+            "in": "query",
+            "required": false,
+            "description": "Catégorie exacte",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Conseils"
+          },
+          {
+            "name": "auteur",
+            "in": "query",
+            "required": false,
+            "description": "Partie du nom de l'auteur",
+            "schema": {
+              "type": "string"
+            },
+            "example": "sarra"
+          },
+          {
+            "name": "minLikes",
+            "in": "query",
+            "required": false,
+            "description": "Nombre minimum de likes",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 20
+          },
+          {
+            "name": "depuis",
+            "in": "query",
+            "required": false,
+            "description": "Blogs publiés depuis X jours",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 7
+          },
+          {
+            "name": "tri",
+            "in": "query",
+            "required": false,
+            "description": "Ordre des résultats",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "recent",
+                "ancien",
+                "populaire"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Résultats",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultats": {
+                      "type": "integer"
+                    },
+                    "blogs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Blog"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/traduire/{id}": {
+      "get": {
+        "tags": [
+          "Traduction"
+        ],
+        "summary": "Traduire un blog (API MyMemory)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Id du blog",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          },
+          {
+            "name": "langue",
+            "in": "query",
+            "required": false,
+            "description": "Langue cible",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "fr",
+                "en",
+                "ar",
+                "es",
+                "de",
+                "it"
+              ]
+            },
+            "example": "en"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original et traduction",
+            "content": {
+              "application/json": {
+                "example": {
+                  "_id": "6af5e1030d75e17a81abd65c",
+                  "langue": "en",
+                  "original": {
+                    "titre": "...",
+                    "contenu": "..."
+                  },
+                  "traduction": {
+                    "titre": "...",
+                    "contenu": "..."
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Langue non disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Blog introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "blog introuvable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commentaire/addcommentaire": {
+      "post": {
+        "tags": [
+          "Commentaires"
+        ],
+        "summary": "Ajouter un commentaire",
+        "description": "Vérifie que le blog existe. Passe par le middleware de modération.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentaireInput"
+              },
+              "example": {
+                "contenu": "Merci, ces conseils sont très utiles !",
+                "auteur": "Mohamed Amine Allouche",
+                "email": "amine.allouche@example.com",
+                "blog": "6af5e1030d75e17a81abd65c"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Commentaire créé",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Commentaire"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Contenu refusé par la modération",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moderation"
+                },
+                "example": {
+                  "message": "contenu refusé par la modération",
+                  "champ": "contenu",
+                  "motInterdit": "ca ya dawla"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Blog introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "blog introuvable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commentaire/showallcommentaire": {
+      "get": {
+        "tags": [
+          "Commentaires"
+        ],
+        "summary": "Afficher tous les commentaires (avec le titre du blog)",
+        "responses": {
+          "200": {
+            "description": "Liste",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Commentaire"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commentaire/showcommentaire/{id}": {
+      "get": {
+        "tags": [
+          "Commentaires"
+        ],
+        "summary": "Afficher un commentaire",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Id du commentaire",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Le commentaire",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Commentaire"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Commentaire introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "commentaire introuvable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commentaire/byblog/{idblog}": {
+      "get": {
+        "tags": [
+          "Commentaires"
+        ],
+        "summary": "Commentaires d'un blog",
+        "parameters": [
+          {
+            "name": "idblog",
+            "in": "path",
+            "required": true,
+            "description": "Id du blog",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Commentaire"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commentaire/updatecommentaire/{id}": {
+      "put": {
+        "tags": [
+          "Commentaires"
+        ],
+        "summary": "Modifier un commentaire",
+        "description": "Passe par le middleware de modération.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Id du commentaire",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentaireInput"
+              },
+              "example": {
+                "contenu": "Merci, super article !"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Commentaire modifié",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Commentaire"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Contenu refusé par la modération",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moderation"
+                },
+                "example": {
+                  "message": "contenu refusé par la modération",
+                  "champ": "contenu",
+                  "motInterdit": "ca ya dawla"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Commentaire introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "commentaire introuvable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commentaire/deletecommentaire/{id}": {
+      "delete": {
+        "tags": [
+          "Commentaires"
+        ],
+        "summary": "Supprimer un commentaire",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Id du commentaire",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Supprimé",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": {
+                  "message": "commentaire supprimé"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Commentaire introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "commentaire introuvable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commentaire/traduire/{id}": {
+      "get": {
+        "tags": [
+          "Traduction"
+        ],
+        "summary": "Traduire un commentaire",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Id du commentaire",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          },
+          {
+            "name": "langue",
+            "in": "query",
+            "required": false,
+            "description": "Langue cible",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "fr",
+                "en",
+                "ar",
+                "es",
+                "de",
+                "it"
+              ]
+            },
+            "example": "en"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original et traduction",
+            "content": {
+              "application/json": {
+                "example": {
+                  "_id": "...",
+                  "langue": "en",
+                  "original": "...",
+                  "traduction": "..."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Langue non disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Commentaire introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "commentaire introuvable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "tags": [
+          "Statistiques et tendances"
+        ],
+        "summary": "Statistiques globales",
+        "description": "Totaux, moyennes, répartition par catégorie, top blogs, top auteurs, activité sur 7 jours (agrégations MongoDB).",
+        "responses": {
+          "200": {
+            "description": "Statistiques"
+          }
+        }
+      }
+    },
+    "/tendances/blogs": {
+      "get": {
+        "tags": [
+          "Statistiques et tendances"
+        ],
+        "summary": "Blogs en tendance",
+        "description": "score = (likes + 3 × commentaires récents) / (âge en jours + 2)^1.5",
+        "parameters": [
+          {
+            "name": "jours",
+            "in": "query",
+            "required": false,
+            "description": "Période en jours (défaut 7)",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 7
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Top 5 des blogs"
+          }
+        }
+      }
+    },
+    "/tendances/categories": {
+      "get": {
+        "tags": [
+          "Statistiques et tendances"
+        ],
+        "summary": "Catégories en tendance",
+        "parameters": [
+          {
+            "name": "jours",
+            "in": "query",
+            "required": false,
+            "description": "Période en jours (défaut 7)",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 7
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Catégories classées par commentaires récents"
+          }
+        }
+      }
+    },
+    "/tendances/mots": {
+      "get": {
+        "tags": [
+          "Statistiques et tendances"
+        ],
+        "summary": "Mots en tendance",
+        "parameters": [
+          {
+            "name": "jours",
+            "in": "query",
+            "required": false,
+            "description": "Période en jours (défaut 7)",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 7
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Top 10 des mots"
+          }
+        }
+      }
+    },
+    "/auteurs": {
+      "get": {
+        "tags": [
+          "Auteurs et badges"
+        ],
+        "summary": "Tous les auteurs (avatar Gravatar, statistiques, badges)",
+        "responses": {
+          "200": {
+            "description": "Liste des auteurs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Auteur"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auteurs/{email}": {
+      "get": {
+        "tags": [
+          "Auteurs et badges"
+        ],
+        "summary": "Profil complet d'un auteur",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "amine.allouche@example.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profil, badges gagnés et à débloquer, blogs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Auteur"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auteur introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "auteur introuvable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ia/reformuler": {
+      "post": {
+        "tags": [
+          "Intelligence artificielle"
+        ],
+        "summary": "Reformuler un texte (Gemini)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "texte"
+                ],
+                "properties": {
+                  "texte": {
+                    "type": "string"
+                  },
+                  "style": {
+                    "type": "string",
+                    "enum": [
+                      "professionnel",
+                      "simple",
+                      "court",
+                      "corriger"
+                    ],
+                    "default": "professionnel"
+                  }
+                }
+              },
+              "example": {
+                "texte": "salut tout le monde jai fait mon stage chez une startup c etait trop bien",
+                "style": "professionnel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Texte reformulé",
+            "content": {
+              "application/json": {
+                "example": {
+                  "style": "professionnel",
+                  "original": "...",
+                  "reformulation": "..."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Texte manquant ou style inconnu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ia/question/{idblog}": {
+      "post": {
+        "tags": [
+          "Intelligence artificielle"
+        ],
+        "summary": "Poser une question sous un blog",
+        "description": "L'IA répond à partir de l'article et des 10 derniers commentaires. Passe par le middleware de modération.",
+        "parameters": [
+          {
+            "name": "idblog",
+            "in": "path",
+            "required": true,
+            "description": "Id du blog",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "question",
+                  "auteur",
+                  "email"
+                ],
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  },
+                  "auteur": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "question": "Combien de questions faut-il préparer pour le recruteur ?",
+                "auteur": "Mohamed Amine Allouche",
+                "email": "amine.allouche@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Question et réponse enregistrées",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Question"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Contenu refusé par la modération",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moderation"
+                },
+                "example": {
+                  "message": "contenu refusé par la modération",
+                  "champ": "contenu",
+                  "motInterdit": "ca ya dawla"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Blog introuvable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "message": "blog introuvable"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ia/questions/{idblog}": {
+      "get": {
+        "tags": [
+          "Intelligence artificielle"
+        ],
+        "summary": "Questions-réponses d'un blog",
+        "parameters": [
+          {
+            "name": "idblog",
+            "in": "path",
+            "required": true,
+            "description": "Id du blog",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6af5e1030d75e17a81abd65c"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultats": {
+                      "type": "integer"
+                    },
+                    "questions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Question"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BlogInput": {
+        "type": "object",
+        "required": [
+          "titre",
+          "contenu",
+          "auteur",
+          "email"
+        ],
+        "properties": {
+          "titre": {
+            "type": "string"
+          },
+          "contenu": {
+            "type": "string"
+          },
+          "auteur": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "categorie": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          }
+        }
+      },
+      "Blog": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "titre": {
+            "type": "string"
+          },
+          "contenu": {
+            "type": "string"
+          },
+          "auteur": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "categorie": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "likes": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CommentaireInput": {
+        "type": "object",
+        "required": [
+          "contenu",
+          "auteur",
+          "email",
+          "blog"
+        ],
+        "properties": {
+          "contenu": {
+            "type": "string"
+          },
+          "auteur": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "blog": {
+            "type": "string",
+            "description": "Id du blog"
+          }
+        }
+      },
+      "Commentaire": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "contenu": {
+            "type": "string"
+          },
+          "auteur": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "blog": {
+            "description": "Id du blog, ou { _id, titre } avec populate"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "blog": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "auteur": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "reponse": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Auteur": {
+        "type": "object",
+        "properties": {
+          "auteur": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "URL Gravatar"
+          },
+          "stats": {
+            "type": "object"
+          },
+          "nbBadges": {
+            "type": "integer"
+          },
+          "badges": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Erreur": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Moderation": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "champ": {
+            "type": "string"
+          },
+          "motInterdit": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

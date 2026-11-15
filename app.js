@@ -7,6 +7,8 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var http = require("http");
 const mongo = require("mongoose");
+const swaggerUi = require("swagger-ui-express"); // ← AJOUTÉ
+const documentation = require("./documentation/openapi.json"); // ← AJOUTÉ
 
 const dbconnect = require("./config/dbconnection.json");
 
@@ -18,7 +20,7 @@ mongo
 var indexRouter = require("./routes/index");
 var blogRouter = require("./routes/blog");
 var commentaireRouter = require("./routes/commentaire");
-var statsRouter = require("./routes/stats"); 
+var statsRouter = require("./routes/stats");
 var tendancesRouter = require("./routes/tendances");
 var auteurRouter = require("./routes/auteur");
 var iaRouter = require("./routes/ia");
@@ -32,6 +34,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "twig");
+
+// documentation Swagger : http://localhost:3002/api-docs
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(documentation)); // ← AJOUTÉ
 
 app.use("/", indexRouter);
 app.use("/blog", blogRouter);
