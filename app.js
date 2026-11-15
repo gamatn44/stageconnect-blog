@@ -50,7 +50,8 @@ app.use(function (err, req, res, next) {
   res.json({ message: err.message });
 });
 
+const port = process.env.PORT || 3002;
 const server = http.createServer(app);
-server.listen(3000, () => console.log("notre server en mode run!!!"));
+server.listen(port, () => console.log("service blog en mode run sur le port " + port));
 
 module.exports = app;

@@ -5,7 +5,7 @@ const Commentaire = new schema(
   {
     contenu: { type: String, required: true },
     auteur: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, lowercase: true, trim: true },
     // relation : chaque commentaire appartient à un blog
     blog: { type: schema.Types.ObjectId, ref: "blog", required: true },
   },
