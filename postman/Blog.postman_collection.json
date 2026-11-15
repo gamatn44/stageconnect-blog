@@ -1,0 +1,602 @@
+{
+  "info": {
+    "_postman_id": "f1f44216-45a9-4e19-b397-29310fd6a8b3",
+    "name": "Blog",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "60149266",
+    "_collection_link": "https://go.postman.co/collection/60149266-f1f44216-45a9-4e19-b397-29310fd6a8b3?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Ajouter un blog",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"titre\": \"Bien \",\r\n  \"contenu\": \"Avant de postuler, renseignez-vous sur la taille de l'entreprise, l'ambiance de l'équipe et les missions proposées. Un bon encadrement compte plus que le prestige du nom.\",\r\n  \"auteur\": \"Mahat Ali Djaba\",\r\n  \"email\": \"mahat.djaba@example.com\",\r\n  \"categorie\": \"Conseils\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/blog/addblog",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "blog",
+            "addblog"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Afficher tous les blogs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/blog/showallblog",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "blog",
+            "showallblog"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Afficher un blog",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/blog/showblog/6af5f40facc3066d1f3bf14f",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "blog",
+            "showblog",
+            "6af5f40facc3066d1f3bf14f"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Modifier un blog",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"auteur\": \"Mohamed \"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/blog/updateblog/6af5f40facc3066d1f3bf14f",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "blog",
+            "updateblog",
+            "6af5f40facc3066d1f3bf14f"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Supprimer un blog",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/blog/deleteblog/6af5e2660d75e17a81abd65d",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "blog",
+            "deleteblog",
+            "6af5e2660d75e17a81abd65d"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ajouter un commentaire",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"contenu\": \"est-YA-DAWLA\",\r\n  \"auteur\": \"Mohamed Amine Allouche\",\r\n  \"email\": \"amine.allouche@example.com\",\r\n  \"blog\": \"6af5f40facc3066d1f3bf14f\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/commentaire/addcommentaire",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "commentaire",
+            "addcommentaire"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "afficher tous les commentaires",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/commentaire/showallcommentaire",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "commentaire",
+            "showallcommentaire"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "afficher un commentaire",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/commentaire/showcommentaire/6af5e3fce3aebf3f92b0d065",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "commentaire",
+            "showcommentaire",
+            "6af5e3fce3aebf3f92b0d065"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "afficher les commentaires d’un blog",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/commentaire/byblog/6af5e1030d75e17a81abd65c",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "commentaire",
+            "byblog",
+            "6af5e1030d75e17a81abd65c"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "modifier un commentaire",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"contenu\": \"Merci, super article !\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/commentaire/updatecommentaire/6af5e3fce3aebf3f92b0d065",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "commentaire",
+            "updatecommentaire",
+            "6af5e3fce3aebf3f92b0d065"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "supprimer un commentaire",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/commentaire/deletecommentaire/6af5e3fce3aebf3f92b0d065",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "commentaire",
+            "deletecommentaire",
+            "6af5e3fce3aebf3f92b0d065"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Rechercher des blogs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/blog/search?minLikes=20&tri=populaire",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "blog",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "CV",
+              "disabled": true
+            },
+            {
+              "key": "categorie",
+              "value": "Conseils",
+              "disabled": true
+            },
+            {
+              "key": "minLikes",
+              "value": "20"
+            },
+            {
+              "key": "tri",
+              "value": "populaire"
+            },
+            {
+              "key": "depuis",
+              "value": "7",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Statistiques globales",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/stats",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "stats"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Blogs en tendance",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tendances/blogs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tendances",
+            "blogs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Catégories en tendance",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tendances/categories",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tendances",
+            "categories"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Mots en tendance",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tendances/mots",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tendances",
+            "mots"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Afficher tous les auteurs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/auteurs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auteurs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Profil d’un auteur",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/auteurs/amine.allouche@example.com",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auteurs",
+            "amine.allouche@example.com"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Liker un blog",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/blog/likeblog/6af5f40facc3066d1f3bf14f",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "blog",
+            "likeblog",
+            "6af5f40facc3066d1f3bf14f"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Traduire un blog (anglais)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/blog/traduire/6af5f40facc3066d1f3bf14f?langue=en",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "blog",
+            "traduire",
+            "6af5f40facc3066d1f3bf14f"
+          ],
+          "query": [
+            {
+              "key": "langue",
+              "value": "en"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Traduire un blog (arabe)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/blog/traduire/ID_BLOG?langue=ar",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "blog",
+            "traduire",
+            "ID_BLOG"
+          ],
+          "query": [
+            {
+              "key": "langue",
+              "value": "ar"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Langue refusée",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/blog/traduire/ID_BLOG?langue=jp",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "blog",
+            "traduire",
+            "ID_BLOG"
+          ],
+          "query": [
+            {
+              "key": "langue",
+              "value": "jp"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Traduire un commentaire",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/commentaire/traduire/ID_COMMENTAIRE?langue=en",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "commentaire",
+            "traduire",
+            "ID_COMMENTAIRE"
+          ],
+          "query": [
+            {
+              "key": "langue",
+              "value": "en"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Reformuler un texte",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"texte\": \"salut tout le monde jai fait mon stage chez une startup c etait trop bien on a fait du node et du mongo et jai appris plein de truc\",\r\n  \"style\": \"professionnel\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ia/reformuler",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ia",
+            "reformuler"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Poser une question",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"question\": \"Combien d'exemples de mes réalisations dois-je préparer ?\",\r\n  \"auteur\": \"Mohamed Amine Allouche\",\r\n  \"email\": \"amine.allouche@example.com\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ia/question/6af5f40facc3066d1f3bf14b",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ia",
+            "question",
+            "6af5f40facc3066d1f3bf14b"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Afficher les questions d’un blog",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/ia/questions/6af5f40facc3066d1f3bf14b",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ia",
+            "questions",
+            "6af5f40facc3066d1f3bf14b"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    }
+  ]
+}
