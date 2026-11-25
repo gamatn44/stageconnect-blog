@@ -1,0 +1,106 @@
+{
+  "info": {
+    "name": "StageConnect - Matching & Recommendation (Port 3004)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Matching - CRUD & Métiers",
+      "item": [
+        {
+          "name": "POST Match + Recommandation Auto (>= 70%)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "http://localhost:3004/api/matchings", "protocol": "http", "host": ["localhost"], "port": "3004", "path": ["api", "matchings"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etudiant\": {\n    \"id\": \"etu_chaima\",\n    \"typeStage\": \"PFE\",\n    \"competences\": [\"Node.js\", \"MongoDB\", \"Express\"],\n    \"isBoosted\": true\n  },\n  \"offre\": {\n    \"id\": \"off_pfe_2026\",\n    \"typeStageObligatoire\": \"PFE\",\n    \"competencesRequises\": [\"Node.js\", \"MongoDB\", \"Express\", \"Docker\"],\n    \"isUrgent\": false\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Match - Critère Éliminatoire (Score 0)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "http://localhost:3004/api/matchings", "protocol": "http", "host": ["localhost"], "port": "3004", "path": ["api", "matchings"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etudiant\": {\n    \"id\": \"etu_chaima\",\n    \"typeStage\": \"Initiation\",\n    \"competences\": [\"Node.js\", \"MongoDB\"]\n  },\n  \"offre\": {\n    \"id\": \"off_pfe_strict\",\n    \"typeStageObligatoire\": \"PFE\",\n    \"competencesRequises\": [\"Node.js\", \"MongoDB\"]\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "GET Tous les Matchings (Triés par score)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3004/api/matchings?etudiantId=etu_chaima", "protocol": "http", "host": ["localhost"], "port": "3004", "path": ["api", "matchings"], "query": [{ "key": "etudiantId", "value": "etu_chaima" }] }
+          }
+        },
+        {
+          "name": "GET Statistiques Matchings",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3004/api/matchings/stats", "protocol": "http", "host": ["localhost"], "port": "3004", "path": ["api", "matchings", "stats"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Recommandations - CRUD & Métiers",
+      "item": [
+        {
+          "name": "POST Ajouter Recommandation Normale (CRUD)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "http://localhost:3004/api/recommendations", "protocol": "http", "host": ["localhost"], "port": "3004", "path": ["api", "recommendations"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etudiantCibleId\": \"etu_chaima\",\n  \"offreId\": \"off_web_2026\",\n  \"commentaire\": \"Offre ajoutée manuellement\",\n  \"isUrgente\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Métier 1 : Parrainage Étudiant",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "http://localhost:3004/api/recommendations/parrainage", "protocol": "http", "host": ["localhost"], "port": "3004", "path": ["api", "recommendations", "parrainage"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parrainId\": \"etu_chaima\",\n  \"etudiantCibleId\": \"etu_sarra\",\n  \"offreId\": \"off_pfe_esprit\",\n  \"commentaire\": \"Super stage Node.js pour toi !\",\n  \"isUrgente\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Métier 2 : Scraping LinkedIn + Anti-Doublon",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "http://localhost:3004/api/recommendations/scrape-linkedin", "protocol": "http", "host": ["localhost"], "port": "3004", "path": ["api", "recommendations", "scrape-linkedin"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etudiantId\": \"etu_chaima\",\n  \"domainKeyword\": \"Stage Node.js\",\n  \"location\": \"Tunisie\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET Afficher Recommandations (Toutes ou Filtrées)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3004/api/recommendations?etudiantCibleId=etu_chaima", "protocol": "http", "host": ["localhost"], "port": "3004", "path": ["api", "recommendations"], "query": [{ "key": "etudiantCibleId", "value": "etu_chaima" }] }
+          }
+        },
+        {
+          "name": "GET Statistiques Recommandations",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3004/api/recommendations/stats", "protocol": "http", "host": ["localhost"], "port": "3004", "path": ["api", "recommendations", "stats"] }
+          }
+        }
+      ]
+    }
+  ]
+}
